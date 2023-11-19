@@ -1,0 +1,57 @@
+<!--
+ChimeraX bundle names must start with "ChimeraX-"
+to avoid clashes with package names in pypi.python.org.
+When uploaded to the ChimeraX toolshed, the bundle
+will be displayed without the ChimeraX- prefix.
+-->
+
+<BundleInfo name="ChimeraX-DMS"
+	    version="0.1" package="chimerax.DMS"
+  	    minSessionVersion="1" maxSessionVersion="1">
+
+  <!-- Additional information about bundle source -->
+  <Author>Siyoung Kim</Author>
+  <Email>kkssy141@gmail.com</Email>
+  <URL>siyoungkim.org</URL>
+
+  <!-- Synopsis is a one-line description
+       Description is a full multi-line description -->
+  <Synopsis>Reading and writing DMS (Desmond Molecular Structure) format files in ChimeraX</Synopsis>
+  <Description>
+Implements capability for reading and writing DMS format files and creating
+ChimeraX atomic structures. Each residue should have a uniuqe set of (chain, resid).
+  </Description>
+
+  <!-- Categories is a list where this bundle should appear -->
+  <Categories>
+    <Category name="General"/>
+  </Categories>
+
+  <!-- Dependencies on other ChimeraX/Python packages -->
+  <Dependencies>
+    <Dependency name="ChimeraX-Core" version="~=1.1"/>
+  </Dependencies>
+
+    <!-- Register DMS format as one of the supported input file formats -->
+  <Providers manager="data formats">
+    <Provider name="DMS" suffixes=".dms" category="Molecular structure"
+		reference_url="https://www.deshawresearch.com/downloads/download_desmond.cgi/Desmond_Users_Guide-0.5.3.pdf"
+		encoding="utf-8" />
+  </Providers>
+
+  <Providers manager="open command">
+    <Provider name="DMS" />
+  </Providers>
+
+  <Providers manager="save command">
+    <Provider name="DMS" />
+  </Providers>
+
+  <Classifiers>
+    <!-- Development Status should be compatible with bundle version number -->
+    <PythonClassifier>Development Status :: 3 - Alpha</PythonClassifier>
+    <PythonClassifier>License :: Freeware</PythonClassifier>
+  </Classifiers>
+
+</BundleInfo>
+
