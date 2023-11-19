@@ -1,0 +1,10 @@
+# Ignore everything
+*
+
+# But not these files
+!.gitignore
+!bundle_info.xml
+!README
+!src
+!src/*
+
