@@ -112,14 +112,15 @@ def save_dms(session, path, models=None):
         atoms  = s.atoms
         bonds  = s.bonds
         coords = atoms.scene_coords
-
+        index_match = {}
 
         for i in range(len(atoms)):
             atom = atoms[i]
             pos  = coords[i]
-            
+
             # if you read pdb -> index starts from 1
-            index = atom.serial_number
+            # atom.serial_number becomes discontinuous at TER
+            index_match[atom.serial_number] = i
             elem  = atom.element.number
             name  = atom.name
             #mass  = atom.element.mass
@@ -128,7 +129,7 @@ def save_dms(session, path, models=None):
             resi  = atom.residue.number
 
             conn.execute(sql_insert_particle, (
-                index, elem, name, resn,
+                i, elem, name, resn,
                 chain, resi, mass, charge,
                 pos[0], pos[1], pos[2], vx, vy, vz, segname,
                 insertion, msys_ct, nbtype, atype, atom.bfactor))
@@ -137,8 +138,8 @@ def save_dms(session, path, models=None):
 
 
         for bond in bonds:
-            i0 = bond.atoms[0].serial_number
-            i1 = bond.atoms[1].serial_number
+            i0 = index_match[bond.atoms[0].serial_number]
+            i1 = index_match[bond.atoms[1].serial_number]
             conn.execute(sql_insert_bond.format(i0, i1, 1))
             num_bonds += 1
 
