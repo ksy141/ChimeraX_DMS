@@ -40,6 +40,10 @@ def open_dms(session, file_name):
     for i, atom in enumerate(atoms):
         name  = atom[0]
         anum  = atom[1]
+        if anum is None:
+            anum = 6
+        elif anum <= 0:
+            anum = 6
         resn  = atom[2]
         resi  = atom[3]
         chain = atom[4]
