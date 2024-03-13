@@ -1,21 +1,23 @@
 # vim: set expandtab shiftwidth=4 softtabstop=4:
+# /Applications/ChimeraX-1.5.app/Contents/Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/chimerax/pdb/__init__.py
 
 from chimerax.core.toolshed import BundleAPI
 from chimerax.open_command  import OpenerInfo
 from chimerax.save_command  import SaverInfo
 from .io import open_dms, save_dms
 from chimerax.atomic import StructuresArg
+import os
 
 # Subclass from chimerax.core.toolshed.BundleAPI and
 # override the method for opening files,
 # inheriting all other methods from the base class.
-class _MyAPI(BundleAPI):
+class _DMS_API(BundleAPI):
 
     api_version = 1
 
     # Implement provider method for opening file
     @staticmethod
-    def run_provider(session, name, mgr):
+    def run_provider(session, name, mgr, **kw):
         # 'run_provider' is called by a manager to invoke the 
         # functionality of the provider.  Since the "data formats"
         # manager never calls run_provider (all the info it needs
@@ -39,11 +41,16 @@ class _MyAPI(BundleAPI):
         
         if mgr == session.open_command:
             class DMSInfo(OpenerInfo):
-                def open(self, session, data, file_name, **kw):
+                def open(self, session, path, file_name, **kw):
                     # The 'open' method is called to open a file,
                     # and must return a (list of models created,
                     # status message) tuple.
-                    return open_dms(session, file_name)
+                    return open_dms(session, path, file_name, **kw)
+                
+                @property
+                def open_args(self):
+                    from chimerax.core.commands import BoolArg
+                    return {'atomic': BoolArg, 'sort': BoolArg}
 
         if mgr == session.save_command:
             class DMSInfo(SaverInfo):
@@ -84,5 +91,5 @@ class _MyAPI(BundleAPI):
 
 
 # Create the ``bundle_api`` object that ChimeraX expects.
-bundle_api = _MyAPI()
+bundle_api = _DMS_API()
 

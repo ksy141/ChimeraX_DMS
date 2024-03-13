@@ -40,7 +40,7 @@ ChimeraX atomic structures. Each residue should have a uniuqe set of (chain, res
   </Providers>
 
   <Providers manager="open command">
-    <Provider name="DMS" />
+    <Provider name="DMS" want_path="true" />
   </Providers>
 
   <Providers manager="save command">

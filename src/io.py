@@ -1,12 +1,15 @@
 # vim: set expandtab shiftwidth=4 softtabstop=4:
-
+# /Applications/ChimeraX-1.5.app/Contents/Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/chimerax/pdb/__init__.py
+# /Applications/ChimeraX-1.5.app/Contents/Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/chimerax/pdb/pdb.py
 # /Applications/ChimeraX-1.5.app/Contents/Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/chimerax/atomic/__init__.py
 # /Applications/ChimeraX-1.5.app/Contents/Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/chimerax/atomic/struct_edit.py
 
 import sqlite3
 import numpy as np
 import os
-from   chimerax.atomic import AtomicStructure
+#from   chimerax.atomic import AtomicStructure
+from   chimerax.atomic.structure import AtomicStructure
+from   chimerax.atomic.structure import Structure
 from   chimerax.atomic.struct_edit import add_atom, add_bond
 from   .sqlcmd   import *
 
@@ -15,18 +18,28 @@ from chimerax.atomic import all_atoms
 # atoms = session.models.list(type=AtomicStructure)[0].atoms
 # bonds = session.models.list(type=AtomicStructure)[0].bonds
 
-def open_dms(session, file_name):
+#def open_dms(session, path, file_name, atomic=True, sort=False):
+def open_dms(session, path, file_name, *, atomic=True, sort=False):
     """Read DMS
     Returns the 2-tuple return value expected by the
     "open command" manager's :py:meth:`run_provider` method.
     """
-    struct = AtomicStructure(session)
+    name = '.'.join(os.path.basename(path).split('.')[:-1])
 
-    conn   = sqlite3.connect(file_name)
-    #atoms  = conn.execute(("SELECT name, anum, resname, resid, chain, "
-    #                       "x, y, z, id " 
-    #                       "FROM particle ORDER BY CHAIN, RESID;")).fetchall()
-    atoms  = conn.execute('SELECT name, anum, resname, resid, chain, x, y, z, id FROM particle;').fetchall()
+    if atomic:
+        struct = AtomicStructure(session, name=name)
+    else:
+        struct = Structure(session, name=name)
+
+    conn = sqlite3.connect(path)
+
+    if sort:
+        print('atoms are sorted by chain and resid')
+        atoms  = conn.execute(("SELECT name, anum, resname, resid, chain, "
+                               "x, y, z, id " 
+                               "FROM particle ORDER BY CHAIN, RESID;")).fetchall()
+    else:
+        atoms  = conn.execute('SELECT name, anum, resname, resid, chain, x, y, z, id FROM particle;').fetchall()
     bonds  = conn.execute('SELECT * FROM bond;').fetchall()
     
 
@@ -80,7 +93,7 @@ def open_dms(session, file_name):
     else:
         pass
     
-    status = (f"Opened {file_name} containing "
+    status = (f"Opened {path} containing "
               f"{n_chains} chains, "
               f"{n_residues} residues, "
               f"{len(atoms)} atoms, "

@@ -13,6 +13,16 @@ devel install ~/ChimeraX_DMS
 toolshed uninstall ChimeraX_DMS
 ```
 
+# Open
+```
+open a.dms b.dms
+```
+
+# Save
+```
+save a.dms models #1
+```
+
 # Notes
-1. Each residue should have a unique (chain, resid) in DMS.
-2. When opening a DMS file, atoms are reordered (!)
+Use sort true if you want your atoms reordered. If you use sorting, each residue should have a unique (chain, resid) in DMS.
+
