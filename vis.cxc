@@ -1,0 +1,36 @@
+
+### Add the following in ChimeraX>Preferences>Startup
+# set bgColor white
+# ui mousemode right zoom
+# ui tool show Shell
+# cartoon suppressBackboneDisplay false
+# camera ortho
+###
+
+set bgColor white
+lighting shadow true
+lighting soft
+graphics silhouettes true
+hide @Vrt
+camera ortho
+
+hbonds (ligand | :LIG | /L) reveal true log true
+
+cartoon suppress false
+
+select (ligand | :LIG | /L)
+view sel
+select clear
+
+select protein
+rainbow
+color byatom target a
+color (ligand | :LIG | /L)  & C salmon
+select clear
+
+coordset #1
+
+ui mousemode right zoom
+
+
+
