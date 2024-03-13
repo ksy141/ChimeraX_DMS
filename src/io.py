@@ -23,10 +23,10 @@ def open_dms(session, file_name):
     struct = AtomicStructure(session)
 
     conn   = sqlite3.connect(file_name)
-    atoms  = conn.execute(("SELECT name, anum, resname, resid, chain, "
-                           "x, y, z, id " 
-                           "FROM particle ORDER BY CHAIN, RESID;")).fetchall()
-    #atoms  = conn.execute('SELECT name, anum, resname, resid, chain, x, y, z FROM particle;').fetchall()
+    #atoms  = conn.execute(("SELECT name, anum, resname, resid, chain, "
+    #                       "x, y, z, id " 
+    #                       "FROM particle ORDER BY CHAIN, RESID;")).fetchall()
+    atoms  = conn.execute('SELECT name, anum, resname, resid, chain, x, y, z FROM particle;').fetchall()
     bonds  = conn.execute('SELECT * FROM bond;').fetchall()
     
 
