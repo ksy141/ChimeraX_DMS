@@ -19,7 +19,7 @@ from chimerax.atomic import all_atoms
 # bonds = session.models.list(type=AtomicStructure)[0].bonds
 
 #def open_dms(session, path, file_name, atomic=True, sort=False):
-def open_dms(session, path, file_name, *, atomic=True, sort=False):
+def open_dms(session, path, file_name, *, atomic=True, sort=False, connect=False):
     """Read DMS
     Returns the 2-tuple return value expected by the
     "open command" manager's :py:meth:`run_provider` method.
@@ -88,10 +88,9 @@ def open_dms(session, path, file_name, *, atomic=True, sort=False):
     
 
     ### Make bonds based on distance if bonds are not in DMS
-    if len(bonds) == 0:
+    #if len(bonds) == 0:
+    if connect:
         struct.connect_structure()
-    else:
-        pass
     
     status = (f"Opened {path} containing "
               f"{n_chains} chains, "

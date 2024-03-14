@@ -50,7 +50,7 @@ class _DMS_API(BundleAPI):
                 @property
                 def open_args(self):
                     from chimerax.core.commands import BoolArg
-                    return {'atomic': BoolArg, 'sort': BoolArg}
+                    return {'atomic': BoolArg, 'sort': BoolArg, 'connect': BoolArg}
 
         if mgr == session.save_command:
             class DMSInfo(SaverInfo):
