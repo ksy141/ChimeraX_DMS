@@ -7,6 +7,27 @@
 # camera ortho
 ###
 
+# default color: https://jmol.sourceforge.net/jscolors/#Atoms%20('CPK'%20colors,%20default%20element%20colors)
+# Hoow to change color: https://www.cgl.ucsf.edu/chimerax/docs/user/commands/colornames.html
+# default radii: https://www.cgl.ucsf.edu/chimerax/docs/user/radii.html
+
+# color @C* & ~protein  #909090
+# color @SOD rgb(171,92,242)
+# color @CLA rgb(31,240,31)
+# size  @SOD atomRadius 1.02
+# size  @CLA atomRadius 1.81
+# color :TIP3@OH2 rgba(1., 0.051, 0.051, 0.5) 
+# style :SOD,CLA sphere
+
+# show only half (python)
+# from chimerax.atomic import all_atoms
+# atoms = all_atoms(session)
+# bA1 = (atoms.scene_coords[:,1] < 0) & (atoms.residues.names != 'PROT')
+# bA2 = (atoms.scene_coords[:,1] > -40) & (atoms.residues.names == 'PROT')
+# bA  = (bA1 | bA2)
+# atoms[bA].residues.atoms.displays = True
+
+
 set bgColor white
 lighting shadow true
 lighting soft
