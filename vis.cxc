@@ -8,7 +8,7 @@
 ###
 
 # default color: https://jmol.sourceforge.net/jscolors/#Atoms%20('CPK'%20colors,%20default%20element%20colors)
-# Hoow to change color: https://www.cgl.ucsf.edu/chimerax/docs/user/commands/colornames.html
+# How to change color: https://www.cgl.ucsf.edu/chimerax/docs/user/commands/colornames.html
 # default radii: https://www.cgl.ucsf.edu/chimerax/docs/user/radii.html
 
 # color @C* & ~protein  #909090
