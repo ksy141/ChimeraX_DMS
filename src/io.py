@@ -36,7 +36,7 @@ def open_dms(session, path, file_name, *, atomic=True, sort=False, connect=False
     if sort:
         print('atoms are sorted by chain and resid')
         atoms  = conn.execute(("SELECT name, anum, resname, resid, chain, "
-                               "x, y, z, id " 
+                               "x, y, z, id, charge " 
                                "FROM particle ORDER BY CHAIN, RESID;")).fetchall()
     else:
         atoms  = conn.execute('SELECT name, anum, resname, resid, chain, x, y, z, id FROM particle;').fetchall()
@@ -57,13 +57,14 @@ def open_dms(session, path, file_name, *, atomic=True, sort=False, connect=False
             anum = 6
         elif anum <= 0:
             anum = 6
-        resn  = atom[2]
-        resi  = atom[3]
-        chain = atom[4]
-        posx  = atom[5]
-        posy  = atom[6]
-        posz  = atom[7]
-        index = atom[8]
+        resn   = atom[2]
+        resi   = atom[3]
+        chain  = atom[4]
+        posx   = atom[5]
+        posy   = atom[6]
+        posz   = atom[7]
+        index  = atom[8]
+        charge = atom[9]
         old2new[index] = i
         
         if chain_prev == chain and resi_prev == resi:
@@ -76,7 +77,7 @@ def open_dms(session, path, file_name, *, atomic=True, sort=False, connect=False
             resi_prev   = resi
             n_residues += 1
         
-        a = add_atom(name, anum, residue, np.array([posx, posy, posz]))
+        a = add_atom(name, anum, residue, np.array([posx, posy, posz]), bfactor=charge)
 
 
     ### Add bonds (if written in DMS)
