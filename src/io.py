@@ -40,7 +40,9 @@ def open_dms(session, path, file_name, *, atomic=True, sort=False, connect=False
                                "FROM particle ORDER BY CHAIN, RESID;")).fetchall()
     else:
         atoms  = conn.execute('SELECT name, anum, resname, resid, chain, x, y, z, id FROM particle;').fetchall()
-    bonds  = conn.execute('SELECT * FROM bond;').fetchall()
+        atoms  = conn.execute(("SELECT name, anum, resname, resid, chain, "
+                               "x, y, z, id, charge FROM particle;")).fetchall()
+     bonds  = conn.execute('SELECT * FROM bond;').fetchall()
     
 
     ### Add atoms
