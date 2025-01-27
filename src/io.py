@@ -18,7 +18,6 @@ from chimerax.atomic import all_atoms
 # atoms = session.models.list(type=AtomicStructure)[0].atoms
 # bonds = session.models.list(type=AtomicStructure)[0].bonds
 
-#def open_dms(session, path, file_name, atomic=True, sort=False):
 def open_dms(session, path, file_name, *, atomic=True, sort=False, connect=False):
     """Read DMS
     Returns the 2-tuple return value expected by the
@@ -31,62 +30,57 @@ def open_dms(session, path, file_name, *, atomic=True, sort=False, connect=False
     else:
         struct = Structure(session, name=name)
 
-    conn = sqlite3.connect(path)
+    conn  = sqlite3.connect(path)
+    cols  = [row[1] for row in conn.execute("PRAGMA table_info(particle);").fetchall()]  # Extract column names
+    if 'id' not in cols: raise IOError("id is not availabe in DMS")
 
-    if sort:
-        print('atoms are sorted by chain and resid')
-        atoms  = conn.execute(("SELECT name, anum, resname, resid, chain, "
-                               "x, y, z, id, charge " 
-                               "FROM particle ORDER BY CHAIN, RESID;")).fetchall()
-    else:
-        atoms  = conn.execute('SELECT name, anum, resname, resid, chain, x, y, z, id FROM particle;').fetchall()
-    bonds  = conn.execute('SELECT * FROM bond;').fetchall()
+    data  = {'id': [], 'name': 'TBD', 'anum': 6, 'resname': 'TBD', 'resid': 1, 'chain': 'X', 'x': 0.0, 'y': 0.0, 'z': 0.0, 'charge': 0.0}
+    for key in cols: data[key] = []
     
-
+    avail = [key for key in data.keys() if isinstance(data[key], list)]
+    if sort:
+        query   = "SELECT " + " , ".join(avail) + " FROM particle ORDER BY CHAIN, RESID;"
+    else:
+        query   = "SELECT " + " , ".join(avail) + " FROM particle;"
+    
+    print(query)
+    atoms = conn.execute(query).fetchall()
+    bonds = conn.execute('SELECT * FROM bond;').fetchall()
+    
     ### Add atoms
-    n_chains   = 0
-    n_residues = 0
-    chain_prev = None
-    resi_prev  = None
-    old2new    = {}
-
-    for i, atom in enumerate(atoms):
-        name  = atom[0]
-        anum  = atom[1]
-        if anum is None:
-            anum = 6
-        elif anum <= 0:
-            anum = 6
-        resn   = atom[2]
-        resi   = atom[3]
-        chain  = atom[4]
-        posx   = atom[5]
-        posy   = atom[6]
-        posz   = atom[7]
-        index  = atom[8]
-        charge = atom[9]
-        old2new[index] = i
-        
-        if chain_prev == chain and resi_prev == resi:
-            # same residue
-            pass
+    for n_atoms, atom in enumerate(atoms, 1):
+        for j in range(len(avail)):
+            data[avail[j]].append(atom[j])
+    
+    ### Check columns that did not exist in structure
+    for key, value in data.items():
+        if isinstance(value, list):
+            data[key] = np.array(value)
         else:
-            if chain_prev != chain: n_chains += 1
-            residue     = struct.new_residue(resn, chain, resi)
-            chain_prev  = chain
-            resi_prev   = resi
-            n_residues += 1
-        
-        a = add_atom(name, anum, residue, np.array([posx, posy, posz]), bfactor=charge)
+            data[key] = np.array([value] * n_atoms)
+    data['newid'] = np.arange(0, n_atoms)
 
+    ### Count residues
+    bA = (data['resid'][1:] == data['resid'][:-1]) & (data['chain'][1:] == data['chain'][:-1])
+    data['resn'] = np.insert(np.cumsum(~bA), 0, 0)
+
+    ### Make structure
+    for i in range(n_atoms):
+        if i == 0:
+            residue = struct.new_residue(data['resname'][i], data['chain'][i], data['resid'][i])
+        elif data['resn'][i] != data['resn'][i-1]:
+            residue = struct.new_residue(data['resname'][i], data['chain'][i], data['resid'][i])
+        a = add_atom(data['name'][i], int(data['anum'][i]), residue, np.array([data['x'][i], data['y'][i], data['z'][i]]), bfactor=data['charge'][i])
 
     ### Add bonds (if written in DMS)
     new_atoms = struct.atoms
     for bond in bonds:
-        b0 = old2new[bond[0]]
-        b1 = old2new[bond[1]]
-        add_bond(new_atoms[b0], new_atoms[b1])
-    
+        b0 = data['newid'][np.where(data['id'] == bond[0])[0][0]]
+        b1 = data['newid'][np.where(data['id'] == bond[1])[0][0]]
+        if b0 < b1:
+            add_bond(new_atoms[b0], new_atoms[b1])
+        else:
+            add_bond(new_atoms[b1], new_atoms[b0])
 
     ### Make bonds based on distance if bonds are not in DMS
     #if len(bonds) == 0:
@@ -94,8 +88,8 @@ def open_dms(session, path, file_name, *, atomic=True, sort=False, connect=False
         struct.connect_structure()
     
     status = (f"Opened {path} containing "
-              f"{n_chains} chains, "
-              f"{n_residues} residues, "
+              f"{len(set(data['chain']))} chains, "
+              f"{len(set(data['resn']))} residues, "
               f"{len(atoms)} atoms, "
               f"{len(bonds)} bonds")
 

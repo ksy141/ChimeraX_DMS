@@ -6,7 +6,7 @@ will be displayed without the ChimeraX- prefix.
 -->
 
 <BundleInfo name="ChimeraX-DMS"
-	    version="0.1" package="chimerax.DMS"
+	    version="0.2" package="chimerax.DMS"
   	    minSessionVersion="1" maxSessionVersion="1">
 
   <!-- Additional information about bundle source -->
